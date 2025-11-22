@@ -10,6 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -20,7 +22,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { saveUser, setCurrentUser } from '../utils/storage';
+import { saveUser } from '../utils/storage';
+import { login } from '../utils/auth';
 import { colors, spacing, typography, shadows } from '../theme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -28,6 +31,17 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 interface SignUpScreenProps {
   navigation: any;
 }
+
+const KeyboardWrapper = ({ children }: { children: React.ReactNode }) => {
+  if (Platform.OS === 'ios') {
+    return (
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardView}>
+        {children}
+      </KeyboardAvoidingView>
+    );
+  }
+  return <View style={styles.keyboardView}>{children}</View>;
+};
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -105,13 +119,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       });
 
       if (success) {
-        await setCurrentUser(username.trim());
-        Alert.alert('Success', 'Account created successfully!', [
-          {
-            text: 'OK',
-            onPress: () => navigation.replace('NotesList'),
-          },
-        ]);
+        // Auto login (triggers auth listener for navigation)
+        await login(username.trim(), password);
       } else {
         Alert.alert('Error', 'Username already exists. Please choose a different username.');
       }
@@ -138,10 +147,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.keyboardView}
-        >
+        <KeyboardWrapper>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
@@ -362,7 +368,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             </Animated.View>
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardWrapper>
       </LinearGradient>
     </SafeAreaView>
   );
@@ -451,7 +457,6 @@ const styles = StyleSheet.create({
   inputWrapperFocused: {
     borderColor: colors.primary,
     backgroundColor: colors.white,
-    ...shadows.small,
   },
   inputWrapperError: {
     borderColor: colors.error,

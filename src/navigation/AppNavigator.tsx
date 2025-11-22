@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { isLoggedIn } from '../utils/auth';
+import { isLoggedIn, addAuthListener } from '../utils/auth';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import NotesListScreen from '../screens/NotesListScreen';
@@ -22,6 +22,10 @@ const AppNavigator: React.FC = () => {
 
   useEffect(() => {
     checkAuthStatus();
+    const unsubscribe = addAuthListener((isAuthenticated) => {
+      setIsAuthenticated(isAuthenticated);
+    });
+    return unsubscribe;
   }, []);
 
   const checkAuthStatus = async () => {

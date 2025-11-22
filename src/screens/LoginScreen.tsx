@@ -10,7 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
-  Dimensions,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -24,13 +25,22 @@ import Animated, {
 import { login } from '../utils/auth';
 import { colors, spacing, typography, shadows } from '../theme';
 
-const { width } = Dimensions.get('window');
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface LoginScreenProps {
   navigation: any;
 }
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const KeyboardWrapper = ({ children }: { children: React.ReactNode }) => {
+  if (Platform.OS === 'ios') {
+    return (
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardView}>
+        {children}
+      </KeyboardAvoidingView>
+    );
+  }
+  return <View style={styles.keyboardView}>{children}</View>;
+};
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -71,11 +81,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
     try {
       const success = await login(username.trim(), password);
-      if (success) {
-        navigation.replace('NotesList');
-      } else {
+      if (!success) {
         Alert.alert('Login Failed', 'Invalid username or password');
       }
+      // Navigation is handled automatically by AppNavigator via auth listener
     } catch (error) {
       Alert.alert('Error', 'An error occurred during login');
     } finally {
@@ -99,10 +108,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.keyboardView}
-        >
+        <KeyboardWrapper>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
@@ -262,7 +268,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             </Animated.View>
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardWrapper>
       </LinearGradient>
     </SafeAreaView>
   );
@@ -362,7 +368,6 @@ const styles = StyleSheet.create({
   inputWrapperFocused: {
     borderColor: colors.primary,
     backgroundColor: colors.white,
-    ...shadows.small,
   },
   inputIcon: {
     marginRight: spacing.s,

@@ -1,97 +1,222 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Offline Notes App
 
-# Getting Started
+A fully functional, offline-first React Native application that allows multiple users to manage their personal notes on a single device. All data is stored locally with complete offline functionality.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- ✅ **Multi-User Authentication**: Sign up and login with unique usernames
+- ✅ **Offline-First**: All data stored locally using AsyncStorage
+- ✅ **Notes Management**: Create, edit, delete, and view notes
+- ✅ **Image Support**: Add images from gallery or camera
+- ✅ **Search**: Real-time search through note titles and content
+- ✅ **Sorting**: Sort notes by date or title (ascending/descending)
+- ✅ **User Isolation**: Each user only sees their own notes
+- ✅ **Modern UI**: Clean, professional interface with smooth animations
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Prerequisites
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- Node.js >= 20
+- React Native development environment set up
+- iOS: Xcode and CocoaPods
+- Android: Android Studio and Android SDK
 
-```sh
-# Using npm
+## Installation
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. iOS Setup
+
+Navigate to the iOS directory and install CocoaPods:
+
+```bash
+cd ios
+pod install
+cd ..
+```
+
+### 3. Android Setup
+
+The Android project is already configured. Make sure you have:
+- Android SDK installed
+- Android emulator or physical device connected
+
+## Running the App
+
+### Start Metro Bundler
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+### Run on iOS
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+```bash
+npm run ios
+```
 
-### Android
+### Run on Android
 
-```sh
-# Using npm
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
+
+## Project Structure
+
+```
+OfflineNotesApp/
+├── src/
+│   ├── screens/
+│   │   ├── LoginScreen.tsx          # User login screen
+│   │   ├── SignUpScreen.tsx         # User registration screen
+│   │   ├── NotesListScreen.tsx      # Main notes list with search/sort
+│   │   └── CreateEditNoteScreen.tsx # Create/edit note screen
+│   ├── components/
+│   │   ├── NoteItem.tsx             # Individual note card component
+│   │   ├── SearchBar.tsx            # Search input component
+│   │   └── SortPicker.tsx           # Sort options picker
+│   ├── utils/
+│   │   ├── storage.ts               # AsyncStorage helpers
+│   │   ├── auth.ts                  # Authentication utilities
+│   │   └── imageHandler.ts          # Image picker and storage
+│   ├── navigation/
+│   │   └── AppNavigator.tsx         # Navigation configuration
+│   └── types/
+│       └── index.ts                 # TypeScript type definitions
+├── App.tsx                          # Main app component
+└── package.json
+```
+
+## Usage
+
+### Creating an Account
+
+1. Launch the app
+2. Tap "Sign Up"
+3. Enter a unique username (minimum 3 characters)
+4. Enter a password (minimum 4 characters)
+5. Confirm your password
+6. Tap "Create Account"
+
+### Logging In
+
+1. Enter your username and password
+2. Tap "Sign In"
+3. You'll be taken to your notes list
+
+### Creating a Note
+
+1. Tap the "+" button (FAB) in the bottom right
+2. Enter a title (optional)
+3. Enter note content
+4. Optionally add an image:
+   - Tap "Choose from Gallery" to select an existing image
+   - Tap "Take Photo" to capture a new photo
+5. Tap "Save" to save the note
+
+### Editing a Note
+
+1. Tap on any note in the list
+2. Make your changes
+3. Tap "Save" to update
+
+### Deleting a Note
+
+1. Long press on a note (or use swipe gesture if implemented)
+2. Confirm deletion in the dialog
+
+### Searching Notes
+
+1. Use the search bar at the top of the notes list
+2. Type to filter notes by title or content
+3. Tap the "✕" to clear the search
+
+### Sorting Notes
+
+1. Tap on the sort picker below the search bar
+2. Select your preferred sort option:
+   - Last Updated (Newest First)
+   - Last Updated (Oldest First)
+   - Title (A to Z)
+   - Title (Z to A)
+
+### Logging Out
+
+1. Tap "Logout" in the top right corner
+2. Confirm logout
+3. You'll be returned to the login screen
+
+## Data Storage
+
+All data is stored locally using AsyncStorage:
+
+- **Users**: Stored in `users` key
+- **Current Session**: Stored in `current_user` key
+- **User Notes**: Stored in `user_<username>_notes` key
+- **User Preferences**: Stored in `user_preferences_<username>` key
+- **Images**: Stored in app's document directory at `notes_images/`
+
+## Permissions
 
 ### iOS
+- Camera: Required for taking photos
+- Photo Library: Required for selecting images
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+### Android
+- Camera: Required for taking photos
+- Read/Write External Storage: Required for image access
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## Technologies Used
 
-```sh
-bundle install
-```
+- **React Native**: Mobile app framework
+- **TypeScript**: Type-safe JavaScript
+- **@react-navigation/native**: Navigation library
+- **@react-native-async-storage/async-storage**: Local data persistence
+- **react-native-image-picker**: Image selection and camera
+- **react-native-fs**: File system operations
 
-Then, and every time you update your native dependencies, run:
+## Security Notes
 
-```sh
-bundle exec pod install
-```
+- Passwords are hashed before storage (simple hash implementation)
+- For production use, consider implementing bcrypt or similar
+- Each user's data is isolated by username prefix
+- No network calls are made - completely offline
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Troubleshooting
 
-```sh
-# Using npm
-npm run ios
+### Images not showing
+- Check that camera/photo library permissions are granted
+- Verify images are being saved to the correct directory
+- Check file paths are correct for your platform
 
-# OR using Yarn
-yarn ios
-```
+### Notes not persisting
+- Verify AsyncStorage is working correctly
+- Check that user is logged in
+- Ensure proper error handling in storage operations
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Navigation issues
+- Clear app data and restart
+- Verify navigation dependencies are installed
+- Check that all screens are properly registered
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Future Enhancements
 
-## Step 3: Modify your app
+- [ ] Rich text editing
+- [ ] Note categories/tags
+- [ ] Note sharing between users
+- [ ] Cloud backup option
+- [ ] Dark mode support
+- [ ] Biometric authentication
+- [ ] Note templates
+- [ ] Export notes as PDF
 
-Now that you have successfully run the app, let's make changes!
+## License
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+This project is open source and available for educational purposes.
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Support
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+For issues or questions, please check the code comments or create an issue in the repository.

@@ -38,6 +38,9 @@ const NotesListScreen: React.FC<NotesListScreenProps> = ({ navigation }) => {
     const [username, setUsername] = useState<string | null>(null);
     const [refreshing, setRefreshing] = useState(false);
 
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const fabScale = useSharedValue(1);
     const fabRotation = useSharedValue(0);
 
@@ -76,6 +79,28 @@ const NotesListScreen: React.FC<NotesListScreenProps> = ({ navigation }) => {
     useEffect(() => {
         filterAndSortNotes();
     }, [notes, searchQuery, sortOption]);
+
+    const handleSearchChange = (text: string) => {
+        setSearchQuery(text);
+        if (text.trim().length > 0) {
+            const query = text.toLowerCase();
+            const matches = notes
+                .map(note => note.title)
+                .filter(title => title.toLowerCase().includes(query))
+                .filter((value, index, self) => self.indexOf(value) === index) // Unique
+                .slice(0, 5); // Limit to 5
+            setSuggestions(matches);
+            setShowSuggestions(matches.length > 0);
+        } else {
+            setSuggestions([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    const handleSuggestionPress = (suggestion: string) => {
+        setSearchQuery(suggestion);
+        setShowSuggestions(false);
+    };
 
     const filterAndSortNotes = () => {
         let filtered = [...notes];
@@ -226,7 +251,25 @@ const NotesListScreen: React.FC<NotesListScreenProps> = ({ navigation }) => {
                 )}
             </LinearGradient>
 
-            <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
+            <View style={{ zIndex: 1 }}>
+                <SearchBar value={searchQuery} onChangeText={handleSearchChange} />
+                {showSuggestions && suggestions.length > 0 && (
+                    <View style={styles.suggestionsContainer}>
+                        {suggestions.map((item, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.suggestionItem}
+                                onPress={() => handleSuggestionPress(item)}
+                            >
+                                <Icon name="magnify" size={16} color={colors.textSecondary} style={styles.suggestionIcon} />
+                                <Text style={styles.suggestionText} numberOfLines={1}>{item}</Text>
+                                <Icon name="arrow-top-left" size={16} color={colors.textTertiary} />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
+            </View>
+
             <SortPicker selectedOption={sortOption} onSelect={handleSortChange} />
 
             <FlatList
@@ -277,6 +320,7 @@ const styles = StyleSheet.create({
         paddingBottom: spacing.xl,
         paddingHorizontal: spacing.m,
         ...shadows.medium,
+        zIndex: 0,
     },
     headerContent: {
         flexDirection: 'row',
@@ -366,6 +410,32 @@ const styles = StyleSheet.create({
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    suggestionsContainer: {
+        position: 'absolute',
+        top: 50, // Height of search bar + margins
+        left: spacing.m,
+        right: spacing.m,
+        backgroundColor: colors.white,
+        borderRadius: 12,
+        ...shadows.medium,
+        maxHeight: 200,
+        overflow: 'hidden',
+    },
+    suggestionItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: spacing.m,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    suggestionIcon: {
+        marginRight: spacing.s,
+    },
+    suggestionText: {
+        flex: 1,
+        ...typography.body,
+        color: colors.textPrimary,
     },
 });
 

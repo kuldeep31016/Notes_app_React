@@ -7,6 +7,7 @@ import {
   Image,
   Platform,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -49,7 +50,7 @@ const NoteItem: React.FC<NoteItemProps> = ({ note, onPress, onDelete }) => {
     if (minutes < 60) return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
     if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
     if (days < 7) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
-    
+
     return new Date(timestamp).toLocaleDateString();
   };
 
@@ -68,23 +69,33 @@ const NoteItem: React.FC<NoteItemProps> = ({ note, onPress, onDelete }) => {
       activeOpacity={0.9}
     >
       <View style={styles.content}>
-        {note.imageUri && (
+        {note.imageUri ? (
           <View style={styles.imageContainer}>
             <Image
               source={{ uri: Platform.OS === 'ios' ? note.imageUri : `file://${note.imageUri}` }}
               style={styles.thumbnail}
               resizeMode="cover"
             />
+            <View style={styles.attachmentBadge}>
+              <Icon name="image" size={12} color={colors.white} />
+            </View>
+          </View>
+        ) : (
+          <View style={styles.iconContainer}>
+            <Icon name="note-text-outline" size={32} color={colors.primary} />
           </View>
         )}
-        <View style={[styles.textContainer, !note.imageUri && styles.textContainerFull]}>
+        <View style={styles.textContainer}>
           <Text style={styles.title} numberOfLines={1}>
             {note.title || 'Untitled Note'}
           </Text>
           <Text style={styles.preview} numberOfLines={2}>
             {getPreview(note.body)}
           </Text>
-          <Text style={styles.date}>{formatDate(note.updatedAt)}</Text>
+          <View style={styles.dateRow}>
+            <Icon name="clock-outline" size={14} color={colors.textTertiary} style={styles.clockIcon} />
+            <Text style={styles.date}>{formatDate(note.updatedAt)}</Text>
+          </View>
         </View>
       </View>
     </AnimatedTouchable>
@@ -107,8 +118,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: spacing.m,
   },
-  textContainerFull: {
-    marginLeft: 0,
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    backgroundColor: colors.backgroundAccent,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
   },
   title: {
     ...typography.h3,
@@ -122,9 +141,28 @@ const styles = StyleSheet.create({
     marginBottom: spacing.s,
     lineHeight: 20,
   },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  clockIcon: {
+    marginRight: spacing.xs,
+  },
   date: {
     ...typography.caption,
     color: colors.textTertiary,
+  },
+  attachmentBadge: {
+    position: 'absolute',
+    top: spacing.xs,
+    right: spacing.xs,
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.small,
   },
   imageContainer: {
     width: 80,

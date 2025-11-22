@@ -183,7 +183,7 @@ const CreateEditNoteScreen: React.FC<CreateEditNoteScreenProps> = ({ navigation,
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
       >
         {/* Header */}
@@ -245,6 +245,25 @@ const CreateEditNoteScreen: React.FC<CreateEditNoteScreenProps> = ({ navigation,
             textAlignVertical="top"
             editable={!loading}
           />
+
+          {/* Character and Word Count */}
+          {(title.trim() || body.trim()) && (
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <Icon name="text" size={16} color={colors.textTertiary} />
+                <Text style={styles.statText}>
+                  {body.split(/\s+/).filter(word => word.length > 0).length} words
+                </Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Icon name="counter" size={16} color={colors.textTertiary} />
+                <Text style={styles.statText}>
+                  {body.length} characters
+                </Text>
+              </View>
+            </View>
+          )}
 
           {/* Image Section */}
           <View style={styles.imageSection}>
@@ -401,6 +420,32 @@ const styles = StyleSheet.create({
   },
   bodyInputFocused: {
     // Add focus styling if needed
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.m,
+    paddingHorizontal: spacing.l,
+    backgroundColor: colors.backgroundAccent,
+    borderRadius: 12,
+    marginTop: spacing.l,
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  statDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: colors.border,
+    marginHorizontal: spacing.m,
+  },
+  statText: {
+    ...typography.caption,
+    color: colors.textTertiary,
+    fontWeight: '500',
   },
   imageSection: {
     marginTop: spacing.m,

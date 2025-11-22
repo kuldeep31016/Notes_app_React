@@ -38,6 +38,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const buttonScale = useSharedValue(1);
   const cardOpacity = useSharedValue(0);
@@ -99,7 +100,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         style={styles.gradient}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.keyboardView}
         >
           <ScrollView
@@ -184,12 +185,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     onChangeText={setPassword}
                     onFocus={() => setPasswordFocused(true)}
                     onBlur={() => setPasswordFocused(false)}
-                    secureTextEntry
+                    secureTextEntry={!showPassword}
                     autoCapitalize="none"
                     autoCorrect={false}
                     editable={!loading}
                     onSubmitEditing={handleLogin}
                   />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.passwordToggle}
+                    disabled={loading}
+                  >
+                    <Icon
+                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={colors.textTertiary}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -360,6 +372,10 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textPrimary,
     padding: 0,
+  },
+  passwordToggle: {
+    padding: spacing.xs,
+    marginLeft: spacing.xs,
   },
   loginButton: {
     marginTop: spacing.m,

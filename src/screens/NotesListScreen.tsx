@@ -204,11 +204,27 @@ const NotesListScreen: React.FC<NotesListScreenProps> = ({ navigation }) => {
         style={styles.header}
       >
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>My Notes</Text>
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.headerTitle}>My Notes</Text>
+            {notes.length > 0 && (
+              <View style={styles.noteCountBadge}>
+                <Icon name="note-text" size={14} color={colors.primary} />
+                <Text style={styles.noteCountText}>{notes.length}</Text>
+              </View>
+            )}
+          </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton} activeOpacity={0.7}>
             <Icon name="logout" size={24} color={colors.white} />
           </TouchableOpacity>
         </View>
+        {searchQuery.length > 0 && (
+          <View style={styles.searchIndicator}>
+            <Icon name="filter" size={16} color={colors.white} />
+            <Text style={styles.searchIndicatorText}>
+              {filteredNotes.length} result{filteredNotes.length !== 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
       </LinearGradient>
 
       <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
@@ -268,9 +284,45 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.m,
+  },
   headerTitle: {
     ...typography.h2,
     color: colors.white,
+  },
+  noteCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.s,
+    paddingVertical: spacing.xs,
+    borderRadius: 12,
+    ...shadows.small,
+  },
+  noteCountText: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  searchIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.m,
+    paddingHorizontal: spacing.s,
+    paddingVertical: spacing.xs,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  searchIndicatorText: {
+    ...typography.caption,
+    color: colors.white,
+    fontWeight: '600',
   },
   logoutButton: {
     padding: spacing.s,
